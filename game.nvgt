@@ -1,0 +1,374 @@
+#include"bgt_compat.nvgt"
+#include "sound_pool.nvgt";
+#include"include/custom_menu.nvgt"
+#include"include/msg.nvgt";
+sound_pool go;
+int dan;
+timer nap;
+int dan_kethu;
+sound bandan;
+sound mt;
+sound music;
+timer shood_time;
+timer check;
+sound thang;
+sound hoimau;
+sound_pool e_shood;
+sound_pool em;
+sound player_lose;;
+sound enemy_lose;;
+sound_pool shood;
+sound wall;
+timer movetime;
+timer eshood;
+int x;
+int y;
+int z;
+int e_x;
+int e_y;
+int mang=1;
+int player_hp;
+int enemy_hp;
+string ver="1.0";
+void main()
+{
+
+bandan.load("sound/dan.ogg");
+mt.load("sound/mt.ogg");
+player_lose.load("sound/player_lose;.ogg");
+enemy_lose.load("sound/enemy_lose;.ogg");
+
+
+
+wall.load("sound/wall.ogg");
+hoimau.load("sound/hoimau.ogg");
+thang.load("sound/thang.wav");
+show_window("shooting game by anhloc. version"+ver);
+screen_reader_speak("loading", false);
+wait(1000);
+music.load("sound/music.ogg");
+menu();
+}
+void menu()
+{
+music.volume=-40;
+wait(300);
+music.volume=-38;
+wait(300);
+music.volume=-36;
+wait(300);
+music.volume=-34;
+wait(300);
+music.volume=-32;
+wait(300);
+music.volume=-30;
+music.play_looped();
+music.volume=-25;
+custom_menu m;
+//set menu sound;
+m.opensound="sound/omenu.ogg";
+m.edgesound="sound/menuedge.ogg";
+m.clicksound="sound/menu2.ogg";
+m.movesound="sound/menu.ogg";
+m.escapeable=false;
+m.add('start game', "s");
+m.add('exit', "ex");
+m.create('main menu');
+while(m.running)
+{
+wait(5);
+m.monitor();
+if(m.is_clicked("s"))
+{
+music.volume=-26;
+wait(300);
+music.volume=-28;
+wait(300);
+music.volume=-30;
+wait(300);
+music.volume=-32;
+wait(300);
+music.volume=-34;
+wait(300);
+music.volume=-36;
+wait(300);
+music.volume=-38;
+wait(300);
+music.volume=-40;
+screen_reader_speak("The game has already started", false);
+start();
+}
+if(m.is_clicked("ex"))
+{
+music.volume=-32;
+wait(200);
+music.volume=-34;
+wait(200);
+music.volume=-36;
+wait(200);
+music.volume=-38;
+wait(200);
+music.volume=-40;
+wait(200);
+music.volume=-42;
+wait(200);
+music.volume=-44;
+wait(200);
+music.volume=-46;
+wait(200);
+music.volume=-48;
+wait(200);
+music.stop();
+wait(500);
+exit();
+}
+}
+
+}
+void start()
+{
+dan=10;
+dan_kethu=10;
+x=0;
+y=0;
+e_x=random(0, 20);
+e_y=random(0,20);
+player_hp=random(100, 1000);
+enemy_hp=random(100, 1000);
+while(true)
+{
+wait(5);
+kiemtra();
+enemy_shood();
+if(key_pressed(KEY_R) and dan<=0)
+{
+bandan.play();
+dan=10;
+}
+if(key_pressed(KEY_D))
+{
+screen_reader_speak("Your gun has "+dan+" bullets", false);
+}
+if(key_pressed(KEY_E))
+{
+screen_reader_speak(enemy_hp+" enemy health", false);
+}
+if(key_down(KEY_LEFT))
+{
+move_left();
+}
+if(key_down(KEY_RIGHT))
+{
+move_right();
+}
+if(key_down(KEY_UP))
+{
+move_up();
+}
+if(key_down(KEY_DOWN))
+{
+move_down();
+}
+if(key_pressed(KEY_LCONTROL))
+{
+player_shood();
+}
+if(key_pressed(KEY_ESCAPE))
+{
+menu();
+}
+if(key_pressed(KEY_H))
+{
+screen_reader_speak(player_hp+" health", false);
+}
+if(key_pressed(KEY_A))
+{
+screen_reader_speak("You have "+mang+" healings", false);
+}
+if (key_pressed(KEY_C))
+{
+screen_reader_speak(x+", "+y, false);
+}
+if(key_pressed(KEY_X))
+{
+screen_reader_speak("Enemies are at "+e_x+", "+e_y, false);
+}
+if(key_pressed(KEY_B))
+{
+mau();
+}
+wait(5);
+kiemtraenemy();
+}
+}
+void kiemtra()
+{
+if(mang<0)
+{
+mang=0;
+}
+
+if(x<0)
+{
+wall.play();
+x=0;
+
+wait(300);
+}
+if(x>20)
+{
+wall.play();
+x=20;
+
+wait(300);
+}
+if(y<0)
+{
+wall.play();
+y=0;
+
+wait(300);
+}
+if(y>20)
+{
+wall.play();
+y=20;
+
+wait(300);
+}
+
+if(enemy_hp<=0)
+{
+enemy_lose.play();
+enemy_lose.volume=-9;
+thang.play();
+msg("you won, you have defeated the enemy");
+mang+=1;
+start();
+}
+if(player_hp<=0)
+{
+player_lose.play();
+msg("you lost, you lost to the enemy");
+mang-=1;
+
+menu();
+
+}
+
+
+
+}
+void move_right()
+{
+if(movetime.elapsed>=250)
+{
+movetime.restart();
+x+=1;
+go.play_stationary("sound/go"+random(1,5)+".ogg", false);
+}
+
+}
+void move_left()
+{
+if(movetime.elapsed>=250)
+{
+movetime.restart();
+x-=1;
+go.play_stationary("sound/go"+random(1,5)+".ogg", false);
+}			
+em.update_listener_3d(x, y, z, 0.0);
+}
+void move_up()
+{
+if(movetime.elapsed>=250)
+{
+movetime.restart();
+y+=1;
+go.play_stationary("sound/go"+random(1,5)+".ogg", false);
+
+}
+em.update_listener_3d(x, y, z, 0.0);
+}
+void move_down()
+{
+if(movetime.elapsed>=250)
+{
+movetime.restart();
+
+y-=1;
+go.play_stationary("sound/go"+random(1,5)+".ogg", false);
+}
+
+
+em.update_listener_3d(x, y, z, 0.0);
+}
+
+void player_shood()
+{
+if(shood_time.elapsed>=250)
+{
+shood_time.restart();
+if(dan>0)
+{
+shood.play_stationary("sound/shood.ogg", false);
+dan-=1;
+}
+else if(dan<=0)
+{
+mt.play();
+}
+if(x==e_x and y==e_y and dan>0)
+{
+enemy_hp-=random(40, 50);
+}
+}
+}
+void enemy_shood()
+{
+if(e_x==x and e_y==y)
+{
+if(eshood.elapsed>=400)
+{
+eshood.restart();
+if(dan_kethu>0)
+{
+e_shood.play_stationary("sound/e_shood.ogg", false);
+dan_kethu-=1;
+player_hp-=random(40, 50);
+}
+else if(dan_kethu<=0)
+{
+if(nap.elapsed>2500)
+{
+nap.restart();
+bandan.play();
+dan_kethu=10;
+}
+}
+}
+}
+}
+void kiemtraenemy()
+{
+if(check.elapsed>=3000)
+{
+check.restart();
+em.play_3d("sound/ui.ogg", x, y, z, e_x, e_y, z, 0.0, false);
+
+}
+}
+void mau()
+{
+if(mang>0)
+{
+hoimau.play();
+mang-=1;
+player_hp+=500;
+screen_reader_speak("You have regained your health and have "+mang+" more blood pumps left", false);
+}
+else if(mang<=0)
+{
+screen_reader_speak("You have no more health regenerations", false);
+}
+}
