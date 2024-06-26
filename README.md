@@ -11,6 +11,7 @@
 - b. healing  
 - a. Check the healing turn  
 - ctrl. shoot  
+- press and hold space to recharge
 - Up, down, left and right arrows. go  
 # there is one thing to note.
 A mistake I will definitely fix in the future. I can't shoot at long range. I will return to the enemy's position and shoot

@@ -13,11 +13,16 @@ timer shood_time;
 timer check;
 sound thang;
 sound hoimau;
+sound fa;
 sound_pool e_shood;
 sound_pool em;
 sound player_lose;;
 sound enemy_lose;;
 sound_pool shood;
+timer rc;
+sound recharge;
+int red=1;
+int dam=50;
 sound wall;
 timer movetime;
 timer eshood;
@@ -32,7 +37,8 @@ int enemy_hp;
 string ver="1.0";
 void main()
 {
-
+fa.load("sound/false.ogg");
+recharge.load("sound/recharge.ogg");
 bandan.load("sound/dan.ogg");
 mt.load("sound/mt.ogg");
 player_lose.load("sound/player_lose;.ogg");
@@ -51,6 +57,7 @@ menu();
 }
 void menu()
 {
+dam=50;
 music.volume=-40;
 wait(300);
 music.volume=-38;
@@ -169,6 +176,32 @@ if(key_down(KEY_DOWN))
 {
 move_down();
 }
+if(key_pressed(KEY_SPACE) and red<=0)
+{
+screen_reader_speak("you have no more recharges left", false);
+}
+if(key_down(KEY_SPACE) and red>0)
+{
+re();
+}
+if(key_released(KEY_SPACE))
+{
+
+recharge.stop();
+rc.pause();
+if(dam>100)
+{
+fa.play();
+dam=20;
+screen_reader_speak("Warning, the damage cannot be greater than 100. Because you were too greedy, the damage decreased from 50 to 20 haha", false);
+}
+else
+{
+screen_reader_speak("Your damage is now "+dam, false);
+red-=1;
+}
+}
+
 if(key_pressed(KEY_LCONTROL))
 {
 player_shood();
@@ -203,6 +236,10 @@ kiemtraenemy();
 }
 void kiemtra()
 {
+if(red<0)
+{
+red=0;
+}
 if(mang<0)
 {
 mang=0;
@@ -244,6 +281,7 @@ enemy_lose.volume=-9;
 thang.play();
 msg("you won, you have defeated the enemy");
 mang+=1;
+red+=1;
 start();
 }
 if(player_hp<=0)
@@ -251,6 +289,7 @@ if(player_hp<=0)
 player_lose.play();
 msg("you lost, you lost to the enemy");
 mang-=1;
+red-=1;
 
 menu();
 
@@ -320,7 +359,7 @@ mt.play();
 }
 if(x==e_x and y==e_y and dan>0)
 {
-enemy_hp-=random(40, 50);
+enemy_hp-=dam;
 }
 }
 }
@@ -370,5 +409,16 @@ screen_reader_speak("You have regained your health and have "+mang+" more blood 
 else if(mang<=0)
 {
 screen_reader_speak("You have no more health regenerations", false);
+}
+}
+void re()
+{
+
+rc.resume();
+recharge.play_looped();
+if(rc.elapsed>=1000)
+{
+rc.restart();
+dam+=5;
 }
 }
